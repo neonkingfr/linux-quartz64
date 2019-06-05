@@ -1972,9 +1972,7 @@ static ssize_t pmbus_set_samples(struct device *dev,
 	if (kstrtol(buf, 0, &val) < 0)
 		return -EINVAL;
 
-	mutex_lock(&data->update_lock);
 	ret = _pmbus_write_word_data(client, reg->page, reg->attr->reg, val);
-	mutex_unlock(&data->update_lock);
 
 	return ret ? : count;
 }
