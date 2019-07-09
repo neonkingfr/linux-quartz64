@@ -34,16 +34,11 @@ building C files and assembler files.
 
 KAFLAGS
 -------
-Additional options to the assembler (for built-in and modules).
-
-AFLAGS_MODULE
--------------
-Additional module specific options to use for $(AS).
+Additional assembler options for modules.
 
 AFLAGS_KERNEL
 -------------
-Additional options for $(AS) when used for assembler
-code for code that is compiled as built-in.
+Additional assembler options for built-in.
 
 KCFLAGS
 -------
@@ -199,6 +194,15 @@ $(objtree) is the directory where output files are saved.
 The output directory is often set using "O=..." on the commandline.
 
 The value can be overridden in which case the default value is ignored.
+
+KBUILD_ABS_SRCTREE
+--------------------------------------------------
+Kbuild uses a relative path to point to the tree when possible. For instance,
+when building in the source tree, the source tree path is '.'
+
+Setting this flag requests Kbuild to use absolute path to the source tree.
+There are some useful cases to do so, like when generating tag files with
+absolute path entries etc.
 
 KBUILD_SIGN_PIN
 ---------------
