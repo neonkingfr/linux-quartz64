@@ -12,6 +12,8 @@
 #include <linux/pinctrl/pinconf-generic.h>
 #include <linux/regmap.h>
 
+#include "pinmux-aspeed.h"
+
 /*
  * The ASPEED SoCs provide typically more than 200 pins for GPIO and other
  * functions. The SoC function enabled on a pin is determined on a priority
@@ -240,8 +242,7 @@
  * opposed to naming them e.g. PINMUX_CTRL_[0-9]). Further, signal expressions
  * reference registers beyond those dedicated to pinmux, such as the system
  * reset control and MAC clock configuration registers. The AST2500 goes a step
- * further and references registers in the graphics IP block, but that isn't
- * handled yet.
+ * further and references registers in the graphics IP block.
  */
 #define SCU2C           0x2C /* Misc. Control Register */
 #define SCU3C           0x3C /* System Reset Control/Status Register */
@@ -525,22 +526,6 @@ struct aspeed_pin_config {
 	u8 value;
 };
 
-struct aspeed_pinctrl_data {
-	struct regmap *maps[ASPEED_NR_PINMUX_IPS];
-
-	const struct pinctrl_pin_desc *pins;
-	const unsigned int npins;
-
-	const struct aspeed_pin_group *groups;
-	const unsigned int ngroups;
-
-	const struct aspeed_pin_function *functions;
-	const unsigned int nfunctions;
-
-	const struct aspeed_pin_config *configs;
-	const unsigned int nconfigs;
-};
-
 #define ASPEED_PINCTRL_PIN(name_) \
 	[name_] = { \
 		.number = name_, \
@@ -548,30 +533,19 @@ struct aspeed_pinctrl_data {
 		.drv_data = (void *) &(PIN_SYM(name_)) \
 	}
 
-struct aspeed_pin_group {
-	const char *name;
-	const unsigned int *pins;
+struct aspeed_pinctrl_data {
+	struct regmap *scu;
+
+	const struct pinctrl_pin_desc *pins;
 	const unsigned int npins;
+
+	const struct aspeed_pin_config *configs;
+	const unsigned int nconfigs;
+
+	struct aspeed_pinmux_data pinmux;
 };
 
-#define ASPEED_PINCTRL_GROUP(name_) { \
-	.name = #name_, \
-	.pins = &(PIN_GROUP_SYM(name_))[0], \
-	.npins = ARRAY_SIZE(PIN_GROUP_SYM(name_)), \
-}
-
-struct aspeed_pin_function {
-	const char *name;
-	const char *const *groups;
-	unsigned int ngroups;
-};
-
-#define ASPEED_PINCTRL_FUNC(name_, ...) { \
-	.name = #name_, \
-	.groups = &FUNC_GROUP_SYM(name_)[0], \
-	.ngroups = ARRAY_SIZE(FUNC_GROUP_SYM(name_)), \
-}
-
+/* Aspeed pinctrl helpers */
 int aspeed_pinctrl_get_groups_count(struct pinctrl_dev *pctldev);
 const char *aspeed_pinctrl_get_group_name(struct pinctrl_dev *pctldev,
 		unsigned int group);
