@@ -779,4 +779,7 @@ config ARCH_HAS_PTE_SPECIAL
 config ARCH_HAS_HUGEPD
 	bool
 
+config AS_DIRTY_HELPERS
+        bool
+
 endmenu
