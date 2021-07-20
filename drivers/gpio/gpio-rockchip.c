@@ -664,21 +664,40 @@ static int rockchip_get_bank_data(struct rockchip_pin_bank *bank)
 }
 
 static struct rockchip_pin_bank *
-rockchip_gpio_find_bank(struct pinctrl_dev *pctldev, const char *name)
+rockchip_gpio_find_bank(struct pinctrl_dev *pctldev, struct device *dev)
 {
+	struct device_node *np = dev->of_node;
 	struct rockchip_pinctrl *info;
 	struct rockchip_pin_bank *bank;
-	int i, found = 0;
+	int i, found = 0, bank_nr = 0;
 
 	info = pinctrl_dev_get_drvdata(pctldev);
 	bank = info->ctrl->pin_banks;
+
+	/* use gpio-ranges to match on new device trees, falling back to the old name method */
+	if (of_property_read_u32_index(np, "gpio-ranges", 2, &i)) {
+		dev_warn(dev, "the gpio-ranges property is not assigned in %pOFn node\n", np);
+		for (i = 0; i < info->ctrl->nr_banks; i++, bank++) {
+			if (!strcmp(bank->name, np->name)) {
+				found = 1;
+				goto out;
+			}
+		}
+		dev_err(dev, "fallback to node name failed on %pOFn node\n", np);
+		goto out;
+	}
+
+	if (i > 0)
+		bank_nr = ( i / 32 );
+
 	for (i = 0; i < info->ctrl->nr_banks; i++, bank++) {
-		if (!strcmp(bank->name, name)) {
+		if (bank_nr == bank->bank_num) {
 			found = 1;
 			break;
 		}
 	}
 
+out:
 	return found ? bank : NULL;
 }
 
@@ -698,7 +717,7 @@ static int rockchip_gpio_probe(struct platform_device *pdev)
 	if (!pctldev)
 		return -EPROBE_DEFER;
 
-	bank = rockchip_gpio_find_bank(pctldev, np->name);
+	bank = rockchip_gpio_find_bank(pctldev, dev);
 	if (!bank)
 		return -EINVAL;
 
