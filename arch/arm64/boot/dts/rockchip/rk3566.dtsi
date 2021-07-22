@@ -20,6 +20,8 @@
 	};
 };
 
+/delete-node/ &combphy0_us;
+/delete-node/ &pipe_phy_grf0;
 /delete-node/ &qos_pcie3x1;
 /delete-node/ &qos_pcie3x2;
 /delete-node/ &qos_sata0;
