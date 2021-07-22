@@ -25,3 +25,4 @@
 /delete-node/ &qos_pcie3x1;
 /delete-node/ &qos_pcie3x2;
 /delete-node/ &qos_sata0;
+/delete-node/ &sata0;
