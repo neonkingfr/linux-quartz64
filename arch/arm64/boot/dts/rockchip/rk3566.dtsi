@@ -20,6 +20,14 @@
 	};
 };
 
+&usbdrd_dwc3 {
+	phys = <&u2phy0_otg>;
+	phy-names = "usb2-phy";
+	extcon = <&usb2phy0>;
+	maximum-speed = "high-speed";
+	snps,dis_u2_susphy_quirk;
+};
+
 /delete-node/ &combphy0_us;
 /delete-node/ &pipe_phy_grf0;
 /delete-node/ &qos_pcie3x1;
