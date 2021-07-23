@@ -624,6 +624,16 @@
 	status = "okay";
 };
 
+&u2phy0_host {
+	phy-supply = <&vcc5v0_usb20_host>;
+	status = "okay";
+};
+
+&u2phy0_otg {
+	phy-supply = <&dcdc_boost>;
+	status = "okay";
+};
+
 &u2phy1_host {
 	phy-supply = <&vcc5v0_usb20_host>;
 	status = "okay";
@@ -634,8 +644,29 @@
 	status = "okay";
 };
 
+&usb2phy0 {
+	status = "okay";
+};
+
 &usb2phy1 {
 	status = "okay";
+};
+
+&usbdrd_dwc3 {
+	status = "okay";
+};
+
+&usbdrd30 {
+	status = "okay";
+};
+
+/* usb3 controller is muxed with sata1 */
+&usbhost_dwc3 {
+	status = "disabled";
+};
+
+&usbhost30 {
+	status = "disabled";
 };
 
 &usb_host0_ehci {
