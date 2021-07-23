@@ -85,6 +85,9 @@
 		pinctrl-names = "default";
 		pinctrl-0 = <&wifi_enable_h>;
 		reset-gpios = <&gpio2 RK_PC2 GPIO_ACTIVE_LOW>;
+		post-power-on-delay-ms = <100>;
+		power-off-delay-us = <5000000>;
+
 	};
 
 	vcc12v_dcin: vcc12v_dcin {
