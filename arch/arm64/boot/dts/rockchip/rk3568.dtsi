@@ -1345,6 +1345,8 @@
 		compatible = "rockchip,rk3568-naneng-combphy";
 		reg = <0x0 0xfe830000 0x0 0x100>;
 		#phy-cells = <1>;
+		assigned-clocks = <&pmucru CLK_PCIEPHY1_REF>;
+		assigned-clock-rates = <100000000>;
 		clocks = <&pmucru CLK_PCIEPHY1_REF>, <&cru PCLK_PIPEPHY1>,
 			 <&cru PCLK_PIPE>;
 		clock-names = "refclk", "apbclk", "pipe_clk";
@@ -1359,6 +1361,8 @@
 		compatible = "rockchip,rk3568-naneng-combphy";
 		reg = <0x0 0xfe840000 0x0 0x100>;
 		#phy-cells = <1>;
+		assigned-clocks = <&pmucru CLK_PCIEPHY2_REF>;
+		assigned-clock-rates = <100000000>;
 		clocks = <&pmucru CLK_PCIEPHY2_REF>, <&cru PCLK_PIPEPHY2>,
 			 <&cru PCLK_PIPE>;
 		clock-names = "refclk", "apbclk", "pipe_clk";
