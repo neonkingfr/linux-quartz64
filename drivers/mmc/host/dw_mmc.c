@@ -1446,11 +1446,13 @@ static void dw_mci_set_ios(struct mmc_host *mmc, struct mmc_ios *ios)
 	switch (ios->power_mode) {
 	case MMC_POWER_UP:
 		if (!IS_ERR(mmc->supply.vmmc)) {
-			ret = mmc_regulator_set_ocr(mmc, mmc->supply.vmmc,
-					ios->vdd);
+			if (mmc->ocr_avail > 0)
+				ret = mmc_regulator_set_ocr(mmc, mmc->supply.vmmc, ios->vdd);
+			else
+				ret = regulator_enable(mmc->supply.vmmc);
+
 			if (ret) {
-				dev_err(slot->host->dev,
-					"failed to enable vmmc regulator\n");
+				dev_err(slot->host->dev, "failed to enable vmmc regulator\n");
 				/*return, if failed turn on vmmc*/
 				return;
 			}
