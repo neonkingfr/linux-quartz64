@@ -96,6 +96,8 @@
 };
 
 &sdmmc_pwr {
+	regulator-min-microvolt = <3300000>;
+	regulator-max-microvolt = <3300000>;
 	status = "okay";
 };
 
