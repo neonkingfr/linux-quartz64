@@ -87,7 +87,6 @@
 		reset-gpios = <&gpio2 RK_PC2 GPIO_ACTIVE_LOW>;
 		post-power-on-delay-ms = <100>;
 		power-off-delay-us = <5000000>;
-
 	};
 
 	vcc12v_dcin: vcc12v_dcin {
@@ -133,10 +132,20 @@
 		enable-active-high;
 		gpio = <&gpio4 RK_PB5 GPIO_ACTIVE_HIGH>;
 		pinctrl-names = "default";
-		pinctrl-0 = <&vcc5v0_usb20_host_en>;
+		pinctrl-0 = <&vcc5v0_usb20_host_en_h>;
 		regulator-min-microvolt = <5000000>;
 		regulator-max-microvolt = <5000000>;
 		vin-supply = <&vcc5v0_usb>;
+	};
+
+	vcc5v0_usb20_otg: vcc5v0_usb20_otg {
+		compatible = "regulator-fixed";
+		regulator-name = "vcc5v0_usb20_otg";
+		enable-active-high;
+		gpio = <&gpio4 RK_PB5 GPIO_ACTIVE_HIGH>;
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		vin-supply = <&dcdc_boost>;
 	};
 
 	vcc3v3_pcie_p: vcc3v3_pcie_p {
@@ -177,7 +186,8 @@
 };
 
 &combphy1_usq {
-        status = "okay";
+	status = "okay";
+	rockchip,enable-ssc;
 };
 
 &combphy2_psq {
@@ -530,7 +540,7 @@
 	};
 
 	usb2 {
-		vcc5v0_usb20_host_en: vcc5v0-usb20-host-en {
+		vcc5v0_usb20_host_en_h: vcc5v0-usb20-host-en_h {
 			rockchip,pins = <4 RK_PB5 RK_FUNC_GPIO &pcfg_pull_none>;
 		};
 	};
@@ -647,7 +657,7 @@
 };
 
 &u2phy0_otg {
-	phy-supply = <&dcdc_boost>;
+	phy-supply = <&vcc5v0_usb20_otg>;
 	status = "okay";
 };
 
@@ -679,11 +689,12 @@
 
 /* usb3 controller is muxed with sata1 */
 &usbhost_dwc3 {
-	status = "disabled";
+//	status = "okay";
 };
 
+/* usb3 controller is muxed with sata1 */
 &usbhost30 {
-	status = "disabled";
+//	status = "okay";
 };
 
 &usb_host0_ehci {
