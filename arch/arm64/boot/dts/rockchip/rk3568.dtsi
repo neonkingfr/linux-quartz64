@@ -892,8 +892,6 @@
 		compatible = "rockchip,rk3568-i2s-tdm";
 		reg = <0x0 0xfe410000 0x0 0x1000>;
 		interrupts = <GIC_SPI 53 IRQ_TYPE_LEVEL_HIGH>;
-		assigned-clocks = <&cru CLK_I2S1_8CH_TX_SRC>, <&cru CLK_I2S1_8CH_RX_SRC>;
-		assigned-clock-rates = <1188000000>, <1188000000>;
 		clocks = <&cru MCLK_I2S1_8CH_TX>, <&cru MCLK_I2S1_8CH_RX>,
 			 <&cru HCLK_I2S1_8CH>;
 		clock-names = "mclk_tx", "mclk_rx", "hclk";
