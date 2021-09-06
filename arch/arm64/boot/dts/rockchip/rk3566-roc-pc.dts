@@ -544,10 +544,6 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&sdmmc1_bus4 &sdmmc1_cmd &sdmmc1_clk &uart9m1_xfer &uart8m1_xfer>;
 	status = "okay";
-
-	mmccard: mmccard {
-		compatible = "brcm,bcm4329-fmac";
-	};
 };
 
 &tsadc {
