@@ -317,10 +317,10 @@
 	vdd_cpu: regulator@1c {
 		compatible = "tcs,tcs4525";
 		reg = <0x1c>;
-		fcs,suspend-voltage-selector = <0>;
+		fcs,suspend-voltage-selector = <1>;
 		regulator-name = "vdd_cpu";
 		regulator-min-microvolt = <712500>;
-		regulator-max-microvolt = <1390000>;
+		regulator-max-microvolt = <1150000>;
 		regulator-ramp-delay = <2300>;
 		regulator-always-on;
 		vin-supply = <&vcc_sys>;
@@ -374,7 +374,7 @@
 				regulator-initial-mode = <0x2>;
 
 				regulator-state-mem {
-					regulator-off-in-suspend;
+					regulator-on-in-suspend;
 					regulator-suspend-microvolt = <900000>;
 				};
 			};
@@ -410,7 +410,7 @@
 				regulator-initial-mode = <0x2>;
 
 				regulator-state-mem {
-					regulator-off-in-suspend;
+					regulator-on-in-suspend;
 				};
 			};
 
@@ -421,7 +421,7 @@
 				regulator-max-microvolt = <1800000>;
 
 				regulator-state-mem {
-					regulator-off-in-suspend;
+					regulator-on-in-suspend;
 				};
 			};
 
@@ -443,7 +443,7 @@
 				regulator-max-microvolt = <900000>;
 
 				regulator-state-mem {
-					regulator-off-in-suspend;
+					regulator-on-in-suspend;
 				};
 			};
 
@@ -925,9 +925,6 @@
 	};
 };
 
-&u2phy0_host {
-	status = "okay";
-};
 
 &u2phy0_otg {
 	status = "okay";
@@ -958,13 +955,6 @@
 };
 
 &usbdrd30 {
-	dr_mode = "otg";
+	dr_mode = "host";
 	status = "okay";
-};
-
-&usbhost30 {
-	status = "okay";
-	maximum-speed = "high-speed";
-	phys = <&u2phy0_host>;
-	phy-names = "usb2-phy";
 };
