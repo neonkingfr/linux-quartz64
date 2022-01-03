@@ -579,10 +579,6 @@
 	status = "disabled";
 };
 
-&usbdrd_dwc3 {
-	status = "disabled";
-};
-
 &usbdrd30 {
 	status = "disabled";
 };

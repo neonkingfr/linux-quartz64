@@ -110,10 +110,6 @@
 	status = "okay";
 };
 
-&usbdrd_dwc3 {
-	status = "okay";
-};
-
 &usbdrd30 {
 	status = "okay";
 };

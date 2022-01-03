@@ -702,12 +702,15 @@
 
 /* sata1 is muxed with the usb3 port */
 &sata1 {
+//	status = "disabled";
 	status = "okay";
 };
 
 /* sata2 is muxed with the pcie2 slot*/
 &sata2 {
+	target-supply = <&vcc3v3_pcie_p>;
 	status = "disabled";
+//	status = "okay";
 };
 
 &sdhci {
@@ -832,22 +835,14 @@
 	status = "okay";
 };
 
-&usbdrd_dwc3 {
-	status = "okay";
-};
-
 &usbdrd30 {
 	status = "okay";
 };
 
 /* usb3 controller is muxed with sata1 */
-&usbhost_dwc3 {
-	status = "disabled";
-};
-
-/* usb3 controller is muxed with sata1 */
 &usbhost30 {
 	status = "disabled";
+//	status = "okay";
 };
 
 &usb_host0_ehci {
