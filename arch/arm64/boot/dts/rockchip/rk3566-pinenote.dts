@@ -958,21 +958,13 @@
 };
 
 &usbdrd30 {
-	status = "okay";
-};
-
-&usbdrd_dwc3 {
 	dr_mode = "otg";
 	status = "okay";
 };
 
 &usbhost30 {
 	status = "okay";
-};
-
-&usbhost_dwc3 {
 	maximum-speed = "high-speed";
 	phys = <&u2phy0_host>;
 	phy-names = "usb2-phy";
-	status = "okay";
 };
