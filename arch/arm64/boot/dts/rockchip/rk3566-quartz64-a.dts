@@ -273,6 +273,16 @@
 		vin-supply = <&vcc_sys>;
 	};
 
+	vcc_lcd_en: vcc_lcd_en {
+		compatible = "regulator-fixed";
+//		gpio = <&gpio2 RK_PC4 GPIO_ACTIVE_HIGH>;
+		regulator-always-on;
+		pinctrl-names = "default";
+		pinctrl-0 = <&vcc_lcd_en_h>;
+		regulator-name = "vcc_lcd_en";
+		vin-supply = <&vcc_sys>;
+	};
+
 	/* sourced from vcc_sys, sdio module operates internally at 3.3v */
 	vcc_wl: vcc_wl {
 		compatible = "regulator-fixed";
@@ -282,6 +292,13 @@
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
 		vin-supply = <&vcc_sys>;
+	};
+
+	backlight: backlight {
+		compatible = "pwm-backlight";
+		pwms = <&pwm14 0 1000000 0>;
+		brightness-levels = <0 4 8 16 32 64 128 255>;
+		default-brightness-level = <6>;
 	};
 };
 
@@ -797,6 +814,12 @@
 			rockchip,pins = <0 RK_PB7 RK_FUNC_GPIO &pcfg_pull_none>;
 		};
 	};
+
+	vcc_lcd_en {
+		vcc_lcd_en_h: vcc-lcd-en-h {
+			rockchip,pins = <2 RK_PC4 RK_FUNC_GPIO &pcfg_pull_none>;
+		};
+	};
 };
 
 &pmu_io_domains {
@@ -814,8 +837,8 @@
 
 /* sata1 is muxed with the usb3 port */
 &sata1 {
-//	status = "disabled";
-	status = "okay";
+	status = "disabled";
+//	status = "okay";
 };
 
 /* sata2 is muxed with the pcie2 slot*/
@@ -953,8 +976,8 @@
 
 /* usb3 controller is muxed with sata1 */
 &usbhost30 {
-	status = "disabled";
-//	status = "okay";
+//	status = "disabled";
+	status = "okay";
 };
 
 &usb_host0_ehci {
@@ -989,3 +1012,65 @@
 		remote-endpoint = <&hdmi_in_vp0>;
 	};
 };
+/*
+&video_phy0 {
+	status = "okay";
+};
+
+&dsi0 {
+	status = "okay";
+	clock-master;
+
+	mipi_panel: panel@0 {
+		compatible = "feiyang,fy07024di26a30d";
+		reg = <0>;
+		backlight = <&backlight>;
+		reset-gpios = <&gpio2 RK_PC4 GPIO_ACTIVE_HIGH>;
+		width-mm = <154>;
+		height-mm = <86>;
+		rotation = <0>;
+//		avdd-supply = <&avdd>;
+//		dvdd-supply = <&vcc3v3_s0>;
+
+		ports {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			port@0 {
+				reg = <0>;
+
+				mipi_in_panel: endpoint {
+					remote-endpoint = <&mipi_out_panel>;
+				};
+			};
+		};
+	};
+};
+
+&dsi0_in {
+	dsi0_in_vp1: endpoint@1 {
+		reg = <1>;
+		remote-endpoint = <&vp1_out_dsi0>;
+	};
+};
+
+&dsi0_out {
+	mipi_out_panel: endpoint {
+		remote-endpoint = <&mipi_in_panel>;
+	};
+
+};
+
+&vp1 {
+	vp1_out_dsi0: endpoint@RK3568_VOP2_EP_MIPI0 {
+		reg = <RK3568_VOP2_EP_MIPI0>;
+		remote-endpoint = <&dsi0_in_vp1>;
+	};
+};
+
+&pwm14 {
+	status = "okay";
+	pinctrl-0 = <&pwm14m1_pins>;
+	pinctrl-names = "default";
+};
+*/
