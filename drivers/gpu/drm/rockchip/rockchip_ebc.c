@@ -959,7 +959,7 @@ static void rockchip_ebc_shutdown(struct platform_device *pdev)
 
 static const struct of_device_id rockchip_ebc_of_match[] = {
 	{ .compatible = "rockchip,rk3568-ebc-tcon" },
-	{}
+	{},
 };
 MODULE_DEVICE_TABLE(of, rockchip_ebc_of_match);
 
