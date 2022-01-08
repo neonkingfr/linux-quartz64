@@ -773,11 +773,8 @@ dw_mipi_dsi_encoder_atomic_check(struct drm_encoder *encoder,
 
 	s->output_type = DRM_MODE_CONNECTOR_DSI;
 	s->color_space = V4L2_COLORSPACE_DEFAULT;
-	s->output_if = dsi->id ? VOP_OUTPUT_IF_MIPI1 : VOP_OUTPUT_IF_MIPI0;
-	if (dsi->slave) {
-		s->output_flags |= ROCKCHIP_OUTPUT_DUAL_CHANNEL_LEFT_RIGHT_MODE;
-		s->output_if |= VOP_OUTPUT_IF_MIPI1;
-	}
+	if (dsi->slave)
+		s->output_flags = ROCKCHIP_OUTPUT_DSI_DUAL;
 
 	return 0;
 }
