@@ -40,7 +40,7 @@
 		enable-gpios = <&gpio3 RK_PC4 GPIO_ACTIVE_HIGH>;
 		pinctrl-0 = <&spk_amp_enable_h>;
 		pinctrl-names = "default";
-		sound-name-prefix = "Amplifier";
+		sound-name-prefix = "Speaker Amp";
 		VCC-supply = <&dcdc_boost>; /* changed to vcc_bat for v1.2 */
 	};
 
@@ -66,6 +66,27 @@
 	bt_sco_codec: bt-sco-codec {
 		compatible = "linux,bt-sco";
 		#sound-dai-cells = <1>;
+	};
+
+	bt-sound {
+		compatible = "simple-audio-card";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		simple-audio-card,name = "PineNote Bluetooth";
+
+		simple-audio-card,dai-link@0 {
+			format = "i2s";
+			frame-master = <&bt_link0_cpu>;
+			bitclock-master = <&bt_link0_cpu>;
+
+			bt_link0_cpu: cpu {
+				sound-dai = <&i2s2_2ch>;
+			};
+
+			bt_link0_codec: codec {
+				sound-dai = <&bt_sco_codec 0>;
+			};
+		};
 	};
 
 	dmic_codec: dmic-codec {
@@ -119,52 +140,42 @@
 		#size-cells = <0>;
 		simple-audio-card,name = "PineNote";
 		simple-audio-card,aux-devs = <&spk_amp>;
-		simple-audio-card,widgets = "Headphone", "Audio Accessory",
-					    "Speaker", "Left Speaker",
-					    "Speaker", "Right Speaker";
-		simple-audio-card,routing = "Audio Accessory", "HPOL",
-					    "Audio Accessory", "HPOR",
-					    "Left Speaker", "Amplifier OUTL",
-					    "Right Speaker", "Amplifier OUTR",
-					    "Amplifier INL", "HPOL",
-					    "Amplifier INR", "HPOR";
+		simple-audio-card,widgets = "Headphone", "Headphones",
+					    "Speaker", "Internal Speakers";
+		simple-audio-card,routing = "Headphones", "HPOL",
+					    "Headphones", "HPOR",
+					    "Internal Speakers", "Speaker Amp OUTL",
+					    "Internal Speakers", "Speaker Amp OUTR",
+					    "Speaker Amp INL", "HPOL",
+					    "Speaker Amp INR", "HPOR";
+		simple-audio-card,pin-switches = "Internal Speakers";
 
 		simple-audio-card,dai-link@0 {
-			cpu {
-				sound-dai = <&pdm>;
-			};
-
-			codec {
-				sound-dai = <&dmic_codec>;
-			};
-		};
-
-		simple-audio-card,dai-link@1 {
 			format = "i2s";
 			mclk-fs = <256>;
-			frame-master = <&link1_cpu>;
-			bitclock-master = <&link1_cpu>;
+			frame-master = <&link0_cpu>;
+			bitclock-master = <&link0_cpu>;
 
-			link1_cpu: cpu {
+			link0_cpu: cpu {
 				sound-dai = <&i2s1_8ch>;
 			};
 
-			link1_codec: codec {
+			link0_codec: codec {
 				sound-dai = <&rk817>;
 			};
 		};
 
-		simple-audio-card,dai-link@2 {
-			format = "i2s";
-			frame-master = <&link2_cpu>;
-			bitclock-master = <&link2_cpu>;
+		simple-audio-card,dai-link@1 {
+			format = "pdm";
+			frame-master = <&link1_cpu>;
+			bitclock-master = <&link1_cpu>;
 
-			link2_cpu: cpu {
-				sound-dai = <&i2s2_2ch>;
+			link1_cpu: cpu {
+				sound-dai = <&pdm>;
 			};
 
-			link2_codec: codec {
-				sound-dai = <&bt_sco_codec 0>;
+			link1_codec: codec {
+				sound-dai = <&dmic_codec>;
 			};
 		};
 	};
@@ -173,24 +184,27 @@
 		compatible = "spi-gpio";
 		#address-cells = <1>;
 		#size-cells = <0>;
-		pinctrl-0 = <&ble_spi_pins>;
+		pinctrl-0 = <&ble_spi_gpio_pins>;
 		pinctrl-names = "default";
 		mosi-gpios = <&gpio3 RK_PC1 GPIO_ACTIVE_HIGH>;
-		cs-gpios = <&gpio3 RK_PC2 GPIO_ACTIVE_LOW>;
+		cs-gpios = <&gpio3 RK_PC2 GPIO_ACTIVE_HIGH>;
 		sck-gpios = <&gpio3 RK_PC3 GPIO_ACTIVE_HIGH>;
 		num-chipselects = <1>;
+		status = "okay";
 
 		/* TODO: write binding */
 		bluetooth@0 {
-			compatible = "wisesun,ws8100-bt";
+			compatible = "pine64,pinenote-ws8100-pen";
 			reg = <0>;
-			host-state-gpios = <&gpio1 RK_PD6 GPIO_ACTIVE_HIGH>;
+			host_state-gpios = <&gpio1 RK_PD6 GPIO_ACTIVE_HIGH>;
 			interrupt-parent = <&gpio0>;
-			interrupts = <RK_PB5 IRQ_TYPE_LEVEL_LOW>;
+			interrupts = <RK_PB5 IRQ_TYPE_EDGE_RISING>;
 			pinctrl-0 = <&ble_host_state_h>, <&ble_int_l>, <&ble_rst_h>;
 			pinctrl-names = "default";
 			reset-gpios = <&gpio3 RK_PC0 GPIO_ACTIVE_HIGH>;
 			spi-3wire;
+			spi-cs-high;
+			spi-max-frequency = <10000>;
 		};
 	};
 
@@ -326,7 +340,7 @@
 		vin-supply = <&vcc_sys>;
 
 		regulator-state-mem {
-			regulator-off-in-suspend;
+			regulator-on-in-suspend;
 		};
 	};
 
@@ -449,6 +463,7 @@
 
 			vccio_acodec: LDO_REG4 {
 				regulator-name = "vccio_acodec";
+				regulator-always-on;
 				regulator-min-microvolt = <3300000>;
 				regulator-max-microvolt = <3300000>;
 
@@ -475,7 +490,7 @@
 				regulator-max-microvolt = <3300000>;
 
 				regulator-state-mem {
-					regulator-off-in-suspend;
+					regulator-on-in-suspend;
 				};
 			};
 
@@ -542,6 +557,8 @@
 		pinctrl-0 = <&pen_fwe>, <&pen_irq_l>, <&pen_rst_l>;
 		pinctrl-names = "default";
 		vdd-supply = <&vcc_3v3_pmu>;
+		touchscreen-inverted-y;
+		touchscreen-inverted-x;
 	};
 };
 
@@ -561,11 +578,13 @@
 		led@0 {
 			reg = <0>;
 			label = "backlight_cool";
+			default-brightness = <0>;
 		};
 
 		led@1 {
 			reg = <1>;
 			label = "backlight_warm";
+			default-brightness = <0>;
 		};
 	};
 
@@ -668,7 +687,8 @@
 	};
 
 	touchscreen@24 {
-		compatible = "cypress,tt21000";
+		compatible = "cypress,tma448";
+//		compatible = "cypress,tt21000";
 		hid-descr-addr = <0x1>;
 		reg = <0x24>;
 		interrupt-parent = <&gpio0>;
@@ -677,21 +697,18 @@
 		pinctrl-names = "default";
 		reset-gpios = <&gpio0 RK_PA5 GPIO_ACTIVE_LOW>;
 		vdd-supply = <&vcc_3v3_pmu>;
-	};
-
-	/* TODO: write binding */
-	hdmi-bridge@28 {
-		compatible = "analogix,anx7688";
-		reg = <0x28>;
-		pinctrl-0 = <&anx7688_enable_l>, <&anx7688_reset_h>;
-		pinctrl-names = "default";
-		status = "disabled";
+		touchscreen-max-pressure = <46>;
+		touchscreen-min-x = <10>;
+		touchscreen-min-y = <5>;
+		touchscreen-size-x = <1863>;
+		touchscreen-size-y = <1399>;
+		touchscreen-x-mm = <1864>;
+		touchscreen-y-mm = <1400>;
 	};
 };
 
 &i2s1_8ch {
-	pinctrl-0 = <&i2s1m0_sclktx>, <&i2s1m0_lrcktx>, <&i2s1m0_sdi0>, <&i2s1m0_sdo0>;
-	pinctrl-names = "default";
+	pinctrl-0 = <&i2s1m0_lrcktx>, <&i2s1m0_sclktx>, <&i2s1m0_sdi0>, <&i2s1m0_sdo0>;
 	rockchip,trcm-sync-tx-only;
 	status = "okay";
 };
@@ -703,6 +720,7 @@
 
 &pdm {
 	pinctrl-0 = <&pdmm0_clk1>, <&pdmm0_sdi1>, <&pdmm0_sdi2>;
+	rockchip,path-map = <1>, <2>, <0>, <3>;
 	status = "okay";
 };
 
@@ -710,20 +728,6 @@
 	accelerometer {
 		accelerometer_int_l: accelerometer-int-l {
 			rockchip,pins = <3 RK_PB2 RK_FUNC_GPIO &pcfg_pull_none>;
-		};
-	};
-
-	anx7688 {
-		anx7688_cabledet_h: anx7688-cabledet-h {
-			rockchip,pins = <4 RK_PD1 RK_FUNC_GPIO &pcfg_pull_none>;
-		};
-
-		anx7688_enable_l: anx7688-enable-l {
-			rockchip,pins = <4 RK_PC6 RK_FUNC_GPIO &pcfg_pull_none>;
-		};
-
-		anx7688_reset_h: anx7688-reset-h {
-			rockchip,pins = <4 RK_PC4 RK_FUNC_GPIO &pcfg_pull_none>;
 		};
 	};
 
@@ -745,20 +749,29 @@
 		};
 
 		ble_int_l: ble-int-l {
-			rockchip,pins = <0 RK_PB5 RK_FUNC_GPIO &pcfg_pull_up>;
+			rockchip,pins = <0 RK_PB5 RK_FUNC_GPIO &pcfg_pull_down>;
 		};
 
 		ble_rst_h: ble-rst-h {
 			rockchip,pins = <3 RK_PC0 RK_FUNC_GPIO &pcfg_pull_none>;
 		};
 
-		ble_spi_pins: ble-spi-pins {
+		ble_spi_gpio_pins: ble-spi-gpio-pins {
 			rockchip,pins = /* data */
-					<3 RK_PC1 RK_FUNC_GPIO &pcfg_pull_up>,
+					<3 RK_PC1 RK_FUNC_GPIO &pcfg_pull_none>,
 					/* cs */
 					<3 RK_PC2 RK_FUNC_GPIO &pcfg_pull_none>,
 					/* clk */
 					<3 RK_PC3 RK_FUNC_GPIO &pcfg_pull_none>;
+		};
+
+		ble_spi_pins: ble-spi-pins {
+			rockchip,pins = /* data */
+					<3 RK_PC1 3 &pcfg_pull_none>,
+					/* cs */
+					<3 RK_PC2 RK_FUNC_GPIO &pcfg_pull_none>,
+					/* clk */
+					<3 RK_PC3 3 &pcfg_pull_none>;
 		};
 	};
 
@@ -835,7 +848,7 @@
 
 	tcpc {
 		tcpc_int_l: tcpc-int-l {
-			rockchip,pins = <0 RK_PA4 RK_FUNC_GPIO &pcfg_pull_up>;
+			rockchip,pins = <0 RK_PA4 RK_FUNC_GPIO &pcfg_pull_none>;
 		};
 	};
 
@@ -924,7 +937,6 @@
 		};
 	};
 };
-
 
 &u2phy0_otg {
 	status = "okay";
