@@ -1159,6 +1159,8 @@ static void goodix_disable_regulators(void *arg)
 static int goodix_ts_probe(struct i2c_client *client,
 			   const struct i2c_device_id *id)
 {
+	struct device *dev = &client->dev;
+	struct device_node *np = dev->of_node;
 	struct goodix_ts_data *ts;
 	const char *cfg_name;
 	int error;
